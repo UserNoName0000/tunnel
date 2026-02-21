@@ -76,6 +76,7 @@
 
 import { type ProgramAdmissionData } from "./university-data";
 import { type ExpenseBreakdown, getExpensesForUniversity } from "./expenses-data";
+import { getEmploymentRate } from "./employment-data";
 
 // ─── 1. GAUSSIAN CDF & ERROR FUNCTION ─────────────────────────────────
 
@@ -285,6 +286,12 @@ export interface RecommendationResult {
     international: ExpenseBreakdown | null;
     dataYear: string | null;
   };
+  /** Employment rate data */
+  employment: {
+    rate2yr: number | null;
+    rate6mo: number | null;
+    dataYear: number | null;
+  };
   /** Descriptive breakdown of the math */
   explanation: {
     mu: number;
@@ -353,6 +360,12 @@ export function generateRecommendations(
         return exp
           ? { domestic: exp.domestic, international: exp.international, dataYear: exp.dataYear }
           : { domestic: null, international: null, dataYear: null };
+      })(),
+      employment: (() => {
+        const emp = getEmploymentRate(program.university, program.category);
+        return emp
+          ? { rate2yr: emp.rate2yr, rate6mo: emp.rate6mo, dataYear: emp.dataYear }
+          : { rate2yr: null, rate6mo: null, dataYear: null };
       })(),
       explanation: {
         mu: Math.round(mu * 100) / 100,

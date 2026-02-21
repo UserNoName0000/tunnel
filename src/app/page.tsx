@@ -51,6 +51,11 @@ interface Recommendation {
     } | null;
     dataYear: string | null;
   };
+  employment: {
+    rate2yr: number | null;
+    rate6mo: number | null;
+    dataYear: number | null;
+  };
   explanation: {
     mu: number;
     sigma: number;
@@ -173,9 +178,7 @@ export default function Home() {
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">T</span>
-            </div>
+            <img src="/UniMaxx.png" alt="UniMaxxing logo" className="w-8 h-8 rounded-lg object-cover" />
             <h1 className="text-xl font-bold tracking-tight">UniMaxxing</h1>
             <span className="text-xs text-muted-foreground hidden sm:block">
         
@@ -211,10 +214,10 @@ export default function Home() {
           ))}
         </div>
         <div className="flex justify-between text-xs text-muted-foreground mb-8">
-          <span className={step >= 1 ? "text-foreground font-medium" : ""}>Grades</span>
-          <span className={step >= 2 ? "text-foreground font-medium" : ""}>Activities</span>
-          <span className={step >= 3 ? "text-foreground font-medium" : ""}>Interests</span>
-          <span className={step >= 4 ? "text-foreground font-medium" : ""}>Results</span>
+          <span className={`flex-1 text-center ${step >= 1 ? "text-foreground font-medium" : ""}`}>Grades</span>
+          <span className={`flex-1 text-center ${step >= 2 ? "text-foreground font-medium" : ""}`}>Activities</span>
+          <span className={`flex-1 text-center ${step >= 3 ? "text-foreground font-medium" : ""}`}>Interests</span>
+          <span className={`flex-1 text-center ${step >= 4 ? "text-foreground font-medium" : ""}`}>Results</span>
         </div>
       </div>
 
@@ -660,6 +663,14 @@ export default function Home() {
                                       </span>
                                     </>
                                   )}
+                                  {rec.employment.rate2yr !== null && (
+                                    <>
+                                      <span>&bull;</span>
+                                      <span className="text-emerald-400 font-medium">
+                                        {rec.employment.rate2yr}% employed
+                                      </span>
+                                    </>
+                                  )}
                                   <span>&bull;</span>
                                   <Badge variant="outline" className="text-[10px]">
                                     {rec.category}
@@ -860,6 +871,54 @@ export default function Home() {
                                       </div>
                                     </div>
                                   </div>
+                                )}
+
+                                {/* Employment Rates */}
+                                {(rec.employment.rate2yr !== null || rec.employment.rate6mo !== null) && (
+                                  <>
+                                    <Separator />
+                                    <div className="space-y-2">
+                                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                        Employment Rate ({rec.employment.dataYear})
+                                      </p>
+                                      <div className="grid grid-cols-2 gap-3">
+                                        {rec.employment.rate2yr !== null && (
+                                          <div className="bg-muted/50 rounded-lg p-3 space-y-1.5">
+                                            <p className="text-xs font-semibold flex items-center gap-1.5">
+                                              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                                              2 Years After Graduation
+                                            </p>
+                                            <div className="space-y-1">
+                                              <div className="flex justify-between text-sm">
+                                                <span className="text-muted-foreground">Employed</span>
+                                                <span className="font-mono font-bold text-emerald-400">
+                                                  {rec.employment.rate2yr}%
+                                                </span>
+                                              </div>
+                                              <Progress value={rec.employment.rate2yr} />
+                                            </div>
+                                          </div>
+                                        )}
+                                        {rec.employment.rate6mo !== null && (
+                                          <div className="bg-muted/50 rounded-lg p-3 space-y-1.5">
+                                            <p className="text-xs font-semibold flex items-center gap-1.5">
+                                              <span className="inline-block w-2 h-2 rounded-full bg-amber-500" />
+                                              6 Months After Graduation
+                                            </p>
+                                            <div className="space-y-1">
+                                              <div className="flex justify-between text-sm">
+                                                <span className="text-muted-foreground">Employed</span>
+                                                <span className="font-mono font-bold text-amber-400">
+                                                  {rec.employment.rate6mo}%
+                                                </span>
+                                              </div>
+                                              <Progress value={rec.employment.rate6mo} />
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </>
                                 )}
 
                                 <Separator />
