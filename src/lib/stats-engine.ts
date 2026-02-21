@@ -1,10 +1,10 @@
 /**
  * ╔══════════════════════════════════════════════════════════════════════╗
- * ║          ADMISSION PROBABILITY & STATISTICS ENGINE                  ║
- * ║                                                                    ║
- * ║  This module implements four advanced mathematical models to       ║
- * ║  estimate a student's probability of admission to a given          ║
- * ║  university program.                                               ║
+ * ║          ADMISSION PROBABILITY & STATISTICS ENGINE                   ║
+ * ║                                                                      ║
+ * ║  This module implements four advanced mathematical models to         ║
+ * ║  estimate a student's probability of admission to a given            ║
+ * ║  university program.                                                 ║
  * ╚══════════════════════════════════════════════════════════════════════╝
  *
  * ── MODELS USED ──────────────────────────────────────────────────────
