@@ -29,7 +29,7 @@ interface Recommendation {
   compositeScore: number;
   tier: AdmissionTier;
   estimatedCutoff: number;
-  enrolment: number;
+  year: number;
   explanation: {
     mu: number;
     sigma: number;
@@ -544,7 +544,7 @@ export default function Home() {
                                 <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
                                   <span>Cutoff: ~{rec.estimatedCutoff}%</span>
                                   <span>&bull;</span>
-                                  <span>Enrolment: {rec.enrolment}</span>
+                                  <span>Data Year: {rec.year}</span>
                                   <span>&bull;</span>
                                   <Badge variant="outline" className="text-[10px]">
                                     {rec.category}

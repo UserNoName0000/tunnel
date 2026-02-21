@@ -125,8 +125,7 @@ function normalCDF(z: number): number {
  *   90-94 → 92.0
  *   85-89 → 87.0
  *   80-84 → 82.0
- *   75-79 → 77.0
- *   <75   → 72.0
+ *   <80   → 74.0  (combined 75-79, 70-74, <70)
  */
 function estimateDistributionParams(data: ProgramAdmissionData): { mu: number; sigma: number } {
   const bins = [
@@ -134,8 +133,7 @@ function estimateDistributionParams(data: ProgramAdmissionData): { mu: number; s
     { midpoint: 92.0, weight: data.pct90_94 },
     { midpoint: 87.0, weight: data.pct85_89 },
     { midpoint: 82.0, weight: data.pct80_84 },
-    { midpoint: 77.0, weight: data.pct75_79 },
-    { midpoint: 72.0, weight: data.pctBelow75 },
+    { midpoint: 74.0, weight: data.pctBelow75 },
   ];
 
   const totalWeight = bins.reduce((s, b) => s + b.weight, 0);
@@ -177,40 +175,32 @@ export function computeAcademicProbability(grade: number, data: ProgramAdmission
  * Returns the posterior mean: E[θ] = α/(α+β)
  */
 export function computeBayesianProbability(grade: number, data: ProgramAdmissionData): number {
-  const n = data.enrolment;
+  // Estimate effective sample size from total bin weights (no enrolment field)
+  // Use a reasonable proxy: higher total % → more data confidence
+  const totalPct = data.pct95plus + data.pct90_94 + data.pct85_89 + data.pct80_84 + data.pctBelow75;
+  const n = Math.max(totalPct * 5, 100); // Scale factor to give meaningful Beta params
 
-  // Calculate cumulative % of students at or above student's grade
+  // Interpolate within bins using 5-bin structure
   let cumulativePct = 0;
-  if (grade >= 95) cumulativePct = data.pct95plus;
-  else if (grade >= 90) cumulativePct = data.pct95plus + data.pct90_94;
-  else if (grade >= 85) cumulativePct = data.pct95plus + data.pct90_94 + data.pct85_89;
-  else if (grade >= 80) cumulativePct = data.pct95plus + data.pct90_94 + data.pct85_89 + data.pct80_84;
-  else if (grade >= 75) cumulativePct = data.pct95plus + data.pct90_94 + data.pct85_89 + data.pct80_84 + data.pct75_79;
-  else cumulativePct = 100;
-
-  // Interpolate within the bin for finer granularity
-  let binFraction = 0;
   if (grade >= 95) {
-    binFraction = Math.min((grade - 95) / 5, 1) * data.pct95plus;
+    const binFraction = Math.min((grade - 95) / 5, 1) * data.pct95plus;
     cumulativePct = binFraction;
   } else if (grade >= 90) {
-    binFraction = ((grade - 90) / 5) * data.pct90_94;
+    const binFraction = ((grade - 90) / 5) * data.pct90_94;
     cumulativePct = data.pct95plus + binFraction;
   } else if (grade >= 85) {
-    binFraction = ((grade - 85) / 5) * data.pct85_89;
+    const binFraction = ((grade - 85) / 5) * data.pct85_89;
     cumulativePct = data.pct95plus + data.pct90_94 + binFraction;
   } else if (grade >= 80) {
-    binFraction = ((grade - 80) / 5) * data.pct80_84;
+    const binFraction = ((grade - 80) / 5) * data.pct80_84;
     cumulativePct = data.pct95plus + data.pct90_94 + data.pct85_89 + binFraction;
-  } else if (grade >= 75) {
-    binFraction = ((grade - 75) / 5) * data.pct75_79;
-    cumulativePct = data.pct95plus + data.pct90_94 + data.pct85_89 + data.pct80_84 + binFraction;
   } else {
-    cumulativePct = 100;
+    // Below 80: interpolate within the combined <80 bin (range ~65-80)
+    const binFraction = Math.max(0, (grade - 65) / 15) * data.pctBelow75;
+    cumulativePct = data.pct95plus + data.pct90_94 + data.pct85_89 + data.pct80_84 + binFraction;
   }
 
   // How much of the distribution is at the student's level or below
-  // (i.e., how many people have a LOWER grade)
   const pctBelow = 100 - cumulativePct;
 
   // α = fraction of admitted students the student is competitive with
@@ -287,7 +277,7 @@ export interface RecommendationResult {
   compositeScore: number;
   tier: AdmissionTier;
   estimatedCutoff: number;
-  enrolment: number;
+  year: number;
   /** Descriptive breakdown of the math */
   explanation: {
     mu: number;
@@ -334,8 +324,9 @@ export function generateRecommendations(
     const { mu, sigma } = estimateDistributionParams(program);
     const z = (grade - mu) / sigma;
 
-    // Beta params for explanation
-    const n = program.enrolment;
+    // Beta params for explanation (estimate n from total bin %)
+    const totalPct = program.pct95plus + program.pct90_94 + program.pct85_89 + program.pct80_84 + program.pctBelow75;
+    const n = Math.max(totalPct * 5, 100);
     const pctBelow = computeBayesianProbability(grade, program);
     const alphaEst = pctBelow * n + 1;
     const betaEst = (1 - pctBelow) * n + 1;
@@ -349,7 +340,7 @@ export function generateRecommendations(
       compositeScore,
       tier,
       estimatedCutoff: program.estimatedCutoff,
-      enrolment: program.enrolment,
+      year: program.year,
       explanation: {
         mu: Math.round(mu * 100) / 100,
         sigma: Math.round(sigma * 100) / 100,
