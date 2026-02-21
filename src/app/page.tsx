@@ -160,9 +160,9 @@ export default function Home() {
   };
 
   const tierLabels: Record<AdmissionTier, string> = {
-    reach: "🎯 Reach",
-    match: "⚖️ Match",
-    safety: "✅ Safety",
+    reach: "Reach",
+    match: "Match",
+    safety: "Safety",
   };
 
   // ── Render ─────────────────────────────────────────────────────────
@@ -514,9 +514,9 @@ export default function Home() {
             {/* Tier Sections */}
             {(
               [
-                { tier: "safety" as const, data: results.safety, label: "✅ Safety Schools", desc: "High likelihood of admission (>75% probability)" },
-                { tier: "match" as const, data: results.match, label: "⚖️ Match Schools", desc: "Moderate chance of admission (40–75% probability)" },
-                { tier: "reach" as const, data: results.reach, label: "🎯 Reach Schools", desc: "Challenging but possible (<40% probability)" },
+                { tier: "safety" as const, data: results.safety, label: "Safety Schools", desc: "High likelihood of admission (>75% probability)" },
+                { tier: "match" as const, data: results.match, label: "Match Schools", desc: "Moderate chance of admission (40–75% probability)" },
+                { tier: "reach" as const, data: results.reach, label: "Reach Schools", desc: "Challenging but possible (<40% probability)" },
               ] as const
             ).map(({ tier, data, label, desc }) => (
               <div key={tier} className="space-y-3">
@@ -808,7 +808,7 @@ export default function Home() {
             <Separator />
             <Card className="border-border/30">
               <CardHeader>
-                <CardTitle>📐 Statistical Methodology</CardTitle>
+                <CardTitle>Statistical Methodology</CardTitle>
                 <CardDescription>
                   The mathematical models used to compute your admission probabilities
                 </CardDescription>
