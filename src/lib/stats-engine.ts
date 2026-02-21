@@ -75,6 +75,7 @@
  */
 
 import { type ProgramAdmissionData } from "./university-data";
+import { type ExpenseBreakdown, getExpensesForUniversity } from "./expenses-data";
 
 // ─── 1. GAUSSIAN CDF & ERROR FUNCTION ─────────────────────────────────
 
@@ -278,6 +279,12 @@ export interface RecommendationResult {
   tier: AdmissionTier;
   estimatedCutoff: number;
   year: number;
+  /** Estimated annual expenses */
+  expenses: {
+    domestic: ExpenseBreakdown | null;
+    international: ExpenseBreakdown | null;
+    dataYear: string | null;
+  };
   /** Descriptive breakdown of the math */
   explanation: {
     mu: number;
@@ -341,6 +348,12 @@ export function generateRecommendations(
       tier,
       estimatedCutoff: program.estimatedCutoff,
       year: program.year,
+      expenses: (() => {
+        const exp = getExpensesForUniversity(program.university);
+        return exp
+          ? { domestic: exp.domestic, international: exp.international, dataYear: exp.dataYear }
+          : { domestic: null, international: null, dataYear: null };
+      })(),
       explanation: {
         mu: Math.round(mu * 100) / 100,
         sigma: Math.round(sigma * 100) / 100,

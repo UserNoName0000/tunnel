@@ -30,6 +30,27 @@ interface Recommendation {
   tier: AdmissionTier;
   estimatedCutoff: number;
   year: number;
+  expenses: {
+    domestic: {
+      tuition: number | null;
+      ancillaryFees: number | null;
+      roomAndBoard: number | null;
+      booksAndSupplies: number | null;
+      transportation: number | null;
+      otherExpenses: number | null;
+      estimatedTotal: number | null;
+    } | null;
+    international: {
+      tuition: number | null;
+      ancillaryFees: number | null;
+      roomAndBoard: number | null;
+      booksAndSupplies: number | null;
+      transportation: number | null;
+      otherExpenses: number | null;
+      estimatedTotal: number | null;
+    } | null;
+    dataYear: string | null;
+  };
   explanation: {
     mu: number;
     sigma: number;
@@ -541,10 +562,18 @@ export default function Home() {
                                 <p className="text-sm text-muted-foreground">
                                   {rec.program}
                                 </p>
-                                <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
+                                <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1 flex-wrap">
                                   <span>Cutoff: ~{rec.estimatedCutoff}%</span>
                                   <span>&bull;</span>
                                   <span>Data Year: {rec.year}</span>
+                                  {rec.expenses.domestic?.estimatedTotal && (
+                                    <>
+                                      <span>&bull;</span>
+                                      <span className="text-blue-400 font-medium">
+                                        ~${Math.round(rec.expenses.domestic.estimatedTotal).toLocaleString()}/yr
+                                      </span>
+                                    </>
+                                  )}
                                   <span>&bull;</span>
                                   <Badge variant="outline" className="text-[10px]">
                                     {rec.category}
@@ -635,6 +664,117 @@ export default function Home() {
                                     </div>
                                   </div>
                                 </div>
+
+                                <Separator />
+
+                                {/* Estimated Expenses */}
+                                {rec.expenses.domestic && (
+                                  <div className="space-y-2">
+                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                      Estimated Annual Expenses ({rec.expenses.dataYear})
+                                    </p>
+                                    <div className="grid grid-cols-2 gap-3">
+                                      {/* Domestic */}
+                                      <div className="bg-muted/50 rounded-lg p-3 space-y-1.5">
+                                        <p className="text-xs font-semibold flex items-center gap-1.5">
+                                          <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />
+                                          Domestic
+                                        </p>
+                                        {rec.expenses.domestic!.tuition !== null && (
+                                          <div className="flex justify-between text-xs">
+                                            <span className="text-muted-foreground">Tuition</span>
+                                            <span className="font-mono">${rec.expenses.domestic!.tuition!.toLocaleString()}</span>
+                                          </div>
+                                        )}
+                                        {rec.expenses.domestic!.ancillaryFees !== null && (
+                                          <div className="flex justify-between text-xs">
+                                            <span className="text-muted-foreground">Ancillary Fees</span>
+                                            <span className="font-mono">${rec.expenses.domestic!.ancillaryFees!.toLocaleString()}</span>
+                                          </div>
+                                        )}
+                                        {rec.expenses.domestic!.roomAndBoard !== null && (
+                                          <div className="flex justify-between text-xs">
+                                            <span className="text-muted-foreground">Room & Board</span>
+                                            <span className="font-mono">${rec.expenses.domestic!.roomAndBoard!.toLocaleString()}</span>
+                                          </div>
+                                        )}
+                                        {rec.expenses.domestic!.booksAndSupplies !== null && (
+                                          <div className="flex justify-between text-xs">
+                                            <span className="text-muted-foreground">Books & Supplies</span>
+                                            <span className="font-mono">${rec.expenses.domestic!.booksAndSupplies!.toLocaleString()}</span>
+                                          </div>
+                                        )}
+                                        {rec.expenses.domestic!.transportation !== null && (
+                                          <div className="flex justify-between text-xs">
+                                            <span className="text-muted-foreground">Transportation</span>
+                                            <span className="font-mono">${rec.expenses.domestic!.transportation!.toLocaleString()}</span>
+                                          </div>
+                                        )}
+                                        {rec.expenses.domestic!.otherExpenses !== null && (
+                                          <div className="flex justify-between text-xs">
+                                            <span className="text-muted-foreground">Other</span>
+                                            <span className="font-mono">${rec.expenses.domestic!.otherExpenses!.toLocaleString()}</span>
+                                          </div>
+                                        )}
+                                        {rec.expenses.domestic!.estimatedTotal !== null && (
+                                          <div className="flex justify-between text-xs font-semibold pt-1 border-t border-border/50">
+                                            <span>Total</span>
+                                            <span className="font-mono text-blue-400">${rec.expenses.domestic!.estimatedTotal!.toLocaleString()}</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                      {/* International */}
+                                      <div className="bg-muted/50 rounded-lg p-3 space-y-1.5">
+                                        <p className="text-xs font-semibold flex items-center gap-1.5">
+                                          <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                                          International
+                                        </p>
+                                        {rec.expenses.international?.tuition !== null && rec.expenses.international?.tuition !== undefined && (
+                                          <div className="flex justify-between text-xs">
+                                            <span className="text-muted-foreground">Tuition</span>
+                                            <span className="font-mono">${rec.expenses.international!.tuition!.toLocaleString()}</span>
+                                          </div>
+                                        )}
+                                        {rec.expenses.international?.ancillaryFees !== null && rec.expenses.international?.ancillaryFees !== undefined && (
+                                          <div className="flex justify-between text-xs">
+                                            <span className="text-muted-foreground">Ancillary Fees</span>
+                                            <span className="font-mono">${rec.expenses.international!.ancillaryFees!.toLocaleString()}</span>
+                                          </div>
+                                        )}
+                                        {rec.expenses.international?.roomAndBoard !== null && rec.expenses.international?.roomAndBoard !== undefined && (
+                                          <div className="flex justify-between text-xs">
+                                            <span className="text-muted-foreground">Room & Board</span>
+                                            <span className="font-mono">${rec.expenses.international!.roomAndBoard!.toLocaleString()}</span>
+                                          </div>
+                                        )}
+                                        {rec.expenses.international?.booksAndSupplies !== null && rec.expenses.international?.booksAndSupplies !== undefined && (
+                                          <div className="flex justify-between text-xs">
+                                            <span className="text-muted-foreground">Books & Supplies</span>
+                                            <span className="font-mono">${rec.expenses.international!.booksAndSupplies!.toLocaleString()}</span>
+                                          </div>
+                                        )}
+                                        {rec.expenses.international?.transportation !== null && rec.expenses.international?.transportation !== undefined && (
+                                          <div className="flex justify-between text-xs">
+                                            <span className="text-muted-foreground">Transportation</span>
+                                            <span className="font-mono">${rec.expenses.international!.transportation!.toLocaleString()}</span>
+                                          </div>
+                                        )}
+                                        {rec.expenses.international?.otherExpenses !== null && rec.expenses.international?.otherExpenses !== undefined && (
+                                          <div className="flex justify-between text-xs">
+                                            <span className="text-muted-foreground">Other</span>
+                                            <span className="font-mono">${rec.expenses.international!.otherExpenses!.toLocaleString()}</span>
+                                          </div>
+                                        )}
+                                        {rec.expenses.international?.estimatedTotal !== null && rec.expenses.international?.estimatedTotal !== undefined && (
+                                          <div className="flex justify-between text-xs font-semibold pt-1 border-t border-border/50">
+                                            <span>Total</span>
+                                            <span className="font-mono text-emerald-400">${rec.expenses.international!.estimatedTotal!.toLocaleString()}</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
 
                                 <Separator />
 
