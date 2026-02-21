@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tunnel — University Admission Advisor",
+  title: "UniMaxxing",
   description: "Find your best-fit Ontario university and program based on your grades, extracurriculars, and interests using advanced statistical modeling.",
 };
 

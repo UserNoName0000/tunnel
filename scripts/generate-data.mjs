@@ -17,44 +17,45 @@ const outputPath = join(__dirname, "..", "src", "lib", "university-data.ts");
 const parsed = JSON.parse(readFileSync(inputPath, "utf-8"));
 
 // ── Category mapping ───────────────────────────────────────────────
+// Each program name maps directly to itself as a category (1:1).
+// Programs not in this map are skipped.
 const categoryMap = {
-  "Agriculture": "Science",
-  "Architecture": "Engineering",
-  "Architecture & Planning": "Engineering",
-  "Arts": "Arts",
-  "Biological & Biomedical Sciences": "Science",
-  "Business & Commerce": "Business",
-  "Commerce/Mgmt/Business Admin": "Business",
-  "Communication & Journalism": "Arts",
-  "Computer & Information Science": "Computer Science",
-  "Education": "Arts",
+  "Agriculture": "Agriculture",
+  "Architecture": "Architecture & Planning",
+  "Architecture & Planning": "Architecture & Planning",
+  "Biological & Biomedical Sciences": "Biological & Biomedical Sciences",
+  "Business & Commerce": "Commerce/Mgmt/Business Admin",
+  "Commerce/Mgmt/Business Admin": "Commerce/Mgmt/Business Admin",
+  "Communication & Journalism": "Communication & Journalism",
+  "Computer & Information Science": "Computer & Information Science",
+  "Education": "Education",
   "Engineering": "Engineering",
-  "Environmental Studies": "Science",
-  "Family & Consumer/Human Sciences": "Health",
-  "Fine & Applied Arts": "Arts",
-  "Fine Arts": "Arts",
-  "Forestry": "Science",
-  "General Science": "Science",
-  "Health Profess & Related Programs": "Health",
-  "Household Science": "Health",
-  "Journalism": "Arts",
-  "Kinesiology/Recreation/Physical Education": "Health",
-  "Landscape Architecture": "Engineering",
-  "Languages & Linguistics": "Arts",
-  "Liberal Arts & Sciences/General Studies/Humanities": "Arts",
-  "Mathematics": "Science",
-  "Mathematics & Statistics": "Science",
-  "Music": "Arts",
-  "Natural Resources & Conservation": "Science",
-  "Nursing": "Health",
-  "Other Administration": "Business",
-  "Physical Education": "Health",
-  "Physical Science": "Science",
-  "Psychology": "Science",
-  "Rehabilitation Medicine": "Health",
-  "Science": "Science",
-  "Social Sciences": "Arts",
-  "Social Work": "Health",
+  "Environmental Studies": "Natural Resources & Conservation",
+  "Family & Consumer/Human Sciences": "Family & Consumer/Human Sciences",
+  "Fine & Applied Arts": "Fine & Applied Arts",
+  "Fine Arts": "Fine & Applied Arts",
+  "Forestry": "Natural Resources & Conservation",
+  "General Science": "General Science",
+  "Health Profess & Related Programs": "Health Profess & Related Programs",
+  "Household Science": "Family & Consumer/Human Sciences",
+  "Journalism": "Communication & Journalism",
+  "Kinesiology/Recreation/Physical Education": "Kinesiology/Recreation/Physical Education",
+  "Landscape Architecture": "Architecture & Planning",
+  "Languages & Linguistics": "Languages & Linguistics",
+  "Liberal Arts & Sciences/General Studies/Humanities": "Liberal Arts & Sciences/General Studies/Humanities",
+  "Mathematics": "Mathematics & Statistics",
+  "Mathematics & Statistics": "Mathematics & Statistics",
+  "Music": "Music",
+  "Natural Resources & Conservation": "Natural Resources & Conservation",
+  "Nursing": "Nursing",
+  "Other Administration": "Commerce/Mgmt/Business Admin",
+  "Physical Education": "Kinesiology/Recreation/Physical Education",
+  "Physical Science": "Physical Science",
+  "Psychology": "Psychology",
+  "Rehabilitation Medicine": "Health Profess & Related Programs",
+  "Science": "General Science",
+  "Social Sciences": "Social Sciences",
+  "Social Work": "Health Profess & Related Programs",
 };
 
 // ── Skip list ──────────────────────────────────────────────────────
@@ -197,14 +198,7 @@ for (const e of entries) {
 ts += `];
 
 /** All unique categories */
-export const CATEGORIES = [
-  "Computer Science",
-  "Engineering",
-  "Business",
-  "Science",
-  "Health",
-  "Arts",
-] as const;
+export const CATEGORIES = [...new Set(UNIVERSITY_DATA.map((d) => d.category))].sort() as string[];
 
 export type Category = (typeof CATEGORIES)[number];
 

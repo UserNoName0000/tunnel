@@ -129,7 +129,7 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           grade: parseFloat(grade),
-          extracurricularScore: ecAnalysis?.score ?? 0.5,
+          extracurricularScore: ecAnalysis?.score ?? 1.0,
           interestCategories: selectedInterests,
         }),
       });
@@ -176,9 +176,9 @@ export default function Home() {
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">T</span>
             </div>
-            <h1 className="text-xl font-bold tracking-tight">Tunnel</h1>
+            <h1 className="text-xl font-bold tracking-tight">UniMaxxing</h1>
             <span className="text-xs text-muted-foreground hidden sm:block">
-              University Admission Advisor
+        
             </span>
           </div>
           {step > 1 && (
@@ -336,6 +336,16 @@ export default function Home() {
                       )}
                     </Button>
                   </div>
+                  <Button
+                    variant="ghost"
+                    className="w-full text-muted-foreground text-sm"
+                    onClick={() => {
+                      setECAnalysis(null);
+                      setStep(3);
+                    }}
+                  >
+                    Skip this step
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -408,29 +418,105 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {CATEGORIES.map((cat) => {
-                const icons: Record<string, string> = {
-                  "Computer Science": "💻",
-                  Engineering: "⚙️",
-                  Business: "💼",
-                  Science: "🔬",
-                  Health: "🏥",
-                  Arts: "🎨",
+                // Inline SVG icons — monochrome, stroke-based, fits dark theme
+                const iconPaths: Record<string, React.ReactNode> = {
+                  "Agriculture": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22V2"/><path d="M5 9c2-1 4-3 7-3s5 2 7 3"/><path d="M5 15c2 1 4 3 7 3s5-2 7-3"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>
+                  ),
+                  "Architecture & Planning": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="18" height="14" rx="1"/><path d="M3 8l9-6 9 6"/><path d="M10 22v-6h4v6"/><path d="M7 12h2v2H7z"/><path d="M15 12h2v2h-2z"/></svg>
+                  ),
+                  "Biological & Biomedical Sciences": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v8"/><path d="M8 6c0-2 1.5-4 4-4s4 2 4 4-1.5 3-4 3-4-1-4-3z"/><path d="M7 14c-2 1-3 3-3 5 0 2 3 3 8 3s8-1 8-3c0-2-1-4-3-5"/><circle cx="12" cy="14" r="2"/></svg>
+                  ),
+                  "Commerce/Mgmt/Business Admin": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M12 12v4"/><path d="M2 12h20"/></svg>
+                  ),
+                  "Communication & Journalism": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16v12H5.2L4 17.3V4z"/><path d="M8 9h8"/><path d="M8 12h4"/></svg>
+                  ),
+                  "Computer & Information Science": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
+                  ),
+                  "Education": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>
+                  ),
+                  "Engineering": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                  ),
+                  "Family & Consumer/Human Sciences": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  ),
+                  "Fine & Applied Arts": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                  ),
+                  "General Science": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 3v7.4L4.2 19.5A1.5 1.5 0 0 0 5.5 22h13a1.5 1.5 0 0 0 1.3-2.5L15 10.4V3"/><path d="M7 3h10"/><path d="M10 12h4"/></svg>
+                  ),
+                  "Health Profess & Related Programs": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                  ),
+                  "Kinesiology/Recreation/Physical Education": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="4" r="2"/><path d="M22 8h-4l-2 3"/><path d="M16 11l-3 5-3-2-4 5"/><path d="M4 19h3l2-3"/></svg>
+                  ),
+                  "Languages & Linguistics": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>
+                  ),
+                  "Liberal Arts & Sciences/General Studies/Humanities": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8"/><path d="M8 11h6"/></svg>
+                  ),
+                  "Mathematics & Statistics": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 8h4"/><path d="M9 6v4"/><path d="M7 17l4-4"/><path d="M7 13l4 4"/><path d="M14 9h3"/><path d="M14 16h3"/><path d="M14 13h3"/></svg>
+                  ),
+                  "Music": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                  ),
+                  "Natural Resources & Conservation": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 14c.3-3-2.2-6.3-5-8-2.8 1.7-5.3 5-5 8 0 3.3 2.2 6 5 8 2.8-2 5-4.7 5-8z"/><path d="M12 22V6"/></svg>
+                  ),
+                  "Nursing": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6 6 6 0 0 0 6-6v-4"/><path d="M22 10 A2 2 0 0 0 20 8 A2 2 0 0 0 18 10"/><path d="M9 11h2"/><path d="M10 10v2"/></svg>
+                  ),
+                  "Physical Science": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg>
+                  ),
+                  "Psychology": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3-2 5.5-4 7l-3 4-3-4c-2-1.5-4-4-4-7a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2"/></svg>
+                  ),
+                  "Social Sciences": (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  ),
+                };
+                const shortLabels: Record<string, string> = {
+                  "Commerce/Mgmt/Business Admin": "Business",
+                  "Communication & Journalism": "Journalism",
+                  "Computer & Information Science": "Computer Science",
+                  "Biological & Biomedical Sciences": "Biology",
+                  "Health Profess & Related Programs": "Health Sciences",
+                  "Kinesiology/Recreation/Physical Education": "Kinesiology",
+                  "Liberal Arts & Sciences/General Studies/Humanities": "Liberal Arts",
+                  "Mathematics & Statistics": "Math & Stats",
+                  "Natural Resources & Conservation": "Environment",
+                  "Family & Consumer/Human Sciences": "Human Sciences",
+                  "Fine & Applied Arts": "Fine Arts",
                 };
                 const selected = selectedInterests.includes(cat);
                 return (
                   <button
                     key={cat}
                     onClick={() => toggleInterest(cat)}
-                    className={`p-4 rounded-xl border-2 transition-all duration-200 text-left space-y-1 ${
+                    className={`p-3 rounded-xl border-2 transition-all duration-200 text-left ${
                       selected
                         ? "border-primary bg-primary/10 shadow-lg shadow-primary/5"
                         : "border-border hover:border-muted-foreground/30 hover:bg-muted/50"
                     }`}
                   >
-                    <span className="text-2xl">{icons[cat]}</span>
-                    <p className="text-sm font-medium">{cat}</p>
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-muted-foreground shrink-0">{iconPaths[cat] ?? <span className="inline-block w-5 h-5 rounded-full border border-current" />}</span>
+                      <p className="text-xs font-medium leading-tight">{shortLabels[cat] ?? cat}</p>
+                    </div>
                   </button>
                 );
               })}
@@ -497,7 +583,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-3xl font-bold font-mono">
-                      {Math.round((ecAnalysis?.score ?? 0.5) * 100)}%
+                      {Math.round((ecAnalysis?.score ?? 1.0) * 100)}%
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">EC Score</p>
                   </div>
