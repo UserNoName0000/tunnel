@@ -310,7 +310,12 @@ export function generateRecommendations(
   interestCategories: string[],
   allPrograms: ProgramAdmissionData[]
 ): RecommendationResult[] {
-  return allPrograms.map((program) => {
+  // Hard-filter: only consider programs whose category matches a selected interest
+  const filtered = allPrograms.filter((p) =>
+    interestCategories.includes(p.category)
+  );
+
+  return filtered.map((program) => {
     // Academic probability (Gaussian CDF)
     const academicProb = computeAcademicProbability(grade, program);
 
@@ -320,10 +325,8 @@ export function generateRecommendations(
     // Combined academic = average of Gaussian and Bayesian (ensemble)
     const ensembleAcademic = 0.6 * academicProb + 0.4 * bayesProb;
 
-    // Interest match score
-    const interestScore = interestCategories.includes(program.category)
-      ? 0.85  // strong match
-      : 0.30; // weak match
+    // Interest score is always strong since we pre-filtered
+    const interestScore = 0.85;
 
     // Composite score via log-odds
     const compositeScore = computeCompositeScore(
